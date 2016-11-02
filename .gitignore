@@ -1,0 +1,7 @@
+.vs/
+Release/
+Debug/
+tmp/
+genjio.sln
+genjio.sdf
+genjio.vcxproj.filters
