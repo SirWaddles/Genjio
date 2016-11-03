@@ -20,7 +20,7 @@ void VideoAnalysisTask::VideoCheck() {
 		printf("Closed\n");
 	}
 
-	double frames = capture.get(cv::CAP_PROP_FRAME_COUNT);
+	double frames = capture.get(cv::CAP_PROP_FRAME_COUNT) / 10.0;
 	double fps = capture.get(cv::CAP_PROP_FPS);
 	double frameWidth = capture.get(cv::CAP_PROP_FRAME_WIDTH);
 	double frameHeight = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
@@ -37,6 +37,7 @@ void VideoAnalysisTask::VideoCheck() {
 	int foundFrames = 0;
 	for (;;) {
 		count++;
+		capture.set(cv::CAP_PROP_POS_FRAMES, double(count) * 10);
 		capture >> image;
 		if (image.empty()) break;
 		cv::Rect region(0, (frameHeight * 0.7), frameWidth * 0.3, frameHeight * 0.3);

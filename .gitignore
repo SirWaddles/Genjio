@@ -5,3 +5,6 @@ tmp/
 genjio.sln
 genjio.sdf
 genjio.vcxproj.filters
+node_modules/
+semantic/
+genjio.opensdf

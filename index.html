@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+<link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+<body>
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <h1 class="ui green image header dividing">
+            <img src="genji.png" class="image">
+            <div class="content">GenjiO</div>
+        </h1>
+        <h4 class="ui header">
+            <span>Upload Genji Highlights</span>
+        </h4>
+
+        <form class="ui large form">
+            <div class="ui segment">
+                <div class="field">
+                    <label for="fileup" class="ui icon button">
+                        <i class="file icon"></i>
+                        <span>Select Highlight</span>
+                    </label>
+                </div>
+                <div class="field">
+                    <input type="file" id="fileup" style="display: none;"/>
+                    <div class="ui teal progress" data-value="0" data-total="100" id="uploadprogress" style="display: none;">
+                        <div class="bar">
+                            <div class="progress"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui indicating progress" data-value="0" data-total="100" id="analyseprogress" style="display: none;">
+                        <div class="bar">
+                            <div class="progress"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field" style="display: none;" id="uploadsuccess">
+                    <h3 class="ui header">Your video is uploaded!</h3>
+                </div>
+                <div class="field" style="display: none;" id="uploadfailure">
+                    <h3 class="ui header">Your video didn't upload. Are you sure it was Genji?</h3>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="semantic/dist/semantic.min.js"></script>
+<script type="text/javascript">
+const chunkSize = 1024 * 1024;
+document.getElementById("fileup").addEventListener("change", uploadVideo);
+
+
+var genjioSocket = new WebSocket("ws://localhost:9002");
+genjioSocket.binaryType = 'blob';
+function uploadVideo(e)
+{
+    $("#uploadprogress").transition("slide down");
+    var file = e.target.files[0];
+    var start = 0;
+    var end = chunkSize;
+    var fileSize = file.size;
+
+    while (start < fileSize) {
+        var chunk = file.slice(start, end);
+        var blobHeader = new Uint32Array(4);
+        blobHeader[0] = 1;
+        blobHeader[1] = fileSize;
+        blobHeader[2] = start;
+        blobHeader[3] = end;
+        var fBlob = new Blob([blobHeader, chunk]);
+
+        start = end;
+        end = start + chunkSize;
+        genjioSocket.send(fBlob);
+        $("#uploadprogress").progress("set percent", Math.floor((start / fileSize) * 100));
+    }
+    $("#uploadprogress").progress("complete");
+    //genjioSocket.send(e.target.files[0]);
+}
+
+genjioSocket.onmessage = function(event) {
+    var msg = JSON.parse(event.data);
+    if (msg.hasOwnProperty("success")) {
+        $("#analyseprogress").progress("complete");
+        if (msg.success) {
+            $("#uploadsuccess").transition("slide down");
+        } else {
+            $("#uploadfailure").transition("slide down");
+        }
+        return;
+    }
+    if (!$("#analyseprogress").data("started")) {
+        $("#analyseprogress").data("started", true);
+        $("#analyseprogress").transition("slide down");
+    }
+    $("#analyseprogress").progress("set percent", Math.floor(msg.progress * 100));
+}
+
+</script>
+</body>
+</html>
