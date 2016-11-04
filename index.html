@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="field" style="display: none;" id="uploadsuccess">
-                    <h3 class="ui header">Your video is uploaded!</h3>
+                    <h3 class="ui header">Your video is uploaded. You look like <span id="templatename"></span>! Awesome!</h3>
                 </div>
                 <div class="field" style="display: none;" id="uploadfailure">
                     <h3 class="ui header">Your video didn't upload. Are you sure it was Genji?</h3>
@@ -53,6 +53,16 @@
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="semantic/dist/semantic.min.js"></script>
 <script type="text/javascript">
+var templateNames = {
+    "bedouin.png": "Bedouin",
+    "chrome.png": "Chrome Genji",
+    "cinnabar.png": "Cinnabar Genji",
+    "malachite.png": "Malachite Genji",
+    "nihon.png": "Nihon",
+    "nomad.png": "Nomad",
+    "orchite.png": "Orchite Genji",
+    "young.png": "Young Genji"
+};
 const chunkSize = 1024 * 1024;
 document.getElementById("fileup").addEventListener("change", uploadVideo);
 
@@ -91,6 +101,7 @@ genjioSocket.onmessage = function(event) {
         $("#analyseprogress").progress("complete");
         if (msg.success) {
             $("#uploadsuccess").transition("slide down");
+            $("#templatename").html(templateNames[msg.template]);
         } else {
             $("#uploadfailure").transition("slide down");
         }

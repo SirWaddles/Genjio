@@ -7,6 +7,7 @@
 struct ImageTemplate {
 	cv::Mat image;
 	cv::Mat mask;
+	std::string templatePath;
 	ImageTemplate();
 	ImageTemplate(int width, int height);
 };

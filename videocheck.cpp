@@ -46,7 +46,7 @@ void VideoAnalysisTask::CreateTemplates(double frameWidth, double frameHeight) {
 		cv::Mat in[] = { result };
 		int from_to[] = { 0,0, 1,1, 2,2, 3,3, 3,4, 3,5 };
 		cv::mixChannels(in, 1, out, 2, from_to, 6);
-
+		fResult.templatePath = templatePaths[i];
 		templates.push_back(fResult);
 	}
 }
@@ -115,7 +115,7 @@ void VideoAnalysisTask::VideoCheck() {
 
 	std::string message;
 	if (double(foundFrames) / frames > 0.6) {
-		message = std::string("{\"success\":true, \"filename\":\"") + contents + "\"}";
+		message = std::string("{\"success\":true, \"filename\":\"") + contents + "\", \"template\":\"" + targetTemplate.templatePath + "\"}";
 	} else {
 		remove(contents.c_str());
 		message = std::string("{\"success\":false}");
