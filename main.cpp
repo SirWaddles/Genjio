@@ -6,6 +6,7 @@
 #include "websocketdef.h"
 #include "task.h"
 #include "files.h"
+#include "db.h"
 
 void receiveWSMessage(WSserver* server, websocketpp::connection_hdl hdl, WSserver::message_ptr msg) {
 	if (msg->get_payload() == "finish") {
@@ -34,6 +35,7 @@ void startAsioServer() {
 }
 
 int main(int argc, char** argv) {
+	DBMan::getDBMan();
 	startAsioServer();
 	return 0;
 }

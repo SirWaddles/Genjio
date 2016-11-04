@@ -14,8 +14,11 @@ void Task::Run() {
 
 void RunTask(WSserver* server, websocketpp::connection_hdl hdl, WSserver::message_ptr msg) {
 	int messageID = *reinterpret_cast<const uint32_t*>(msg->get_payload().c_str());
+	printf("Received message with ID: %d\n", messageID);
 	switch (messageID) {
 	case 1:
+		server->get_io_service().post(std::bind(&Task::RunTask<FileCreateTask>, server, hdl, msg->get_payload()));
+	case 2:
 		server->get_io_service().post(std::bind(&Task::RunTask<FileAssemblerTask>, server, hdl, msg->get_payload()));
 	}
 }

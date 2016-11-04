@@ -10,6 +10,13 @@ protected:
 	int fileSize;
 	int start;
 	int end;
+	int fileID;
+};
+
+class FileCreateTask : public Task {
+public:
+	using Task::Task;
+	virtual void Run();
 };
 
 class FileMapEntry {

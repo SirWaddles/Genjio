@@ -69,21 +69,34 @@ document.getElementById("fileup").addEventListener("change", uploadVideo);
 
 var genjioSocket = new WebSocket("ws://localhost:9002");
 genjioSocket.binaryType = 'blob';
+var fileContainer;
+
 function uploadVideo(e)
 {
     $("#uploadprogress").transition("slide down");
-    var file = e.target.files[0];
+    fileContainer = e.target.files[0];
+    var fileSize = fileContainer.size;
+
+    var blobHeader = new Uint32Array(2);
+    blobHeader[0] = 1;
+    blobHeader[1] = fileSize;
+    genjioSocket.send(blobHeader);
+}
+
+function doVideoUpload(newID)
+{
     var start = 0;
     var end = chunkSize;
-    var fileSize = file.size;
+    var fileSize = fileContainer.size;
 
     while (start < fileSize) {
-        var chunk = file.slice(start, end);
-        var blobHeader = new Uint32Array(4);
-        blobHeader[0] = 1;
-        blobHeader[1] = fileSize;
-        blobHeader[2] = start;
-        blobHeader[3] = end;
+        var chunk = fileContainer.slice(start, end);
+        var blobHeader = new Uint32Array(5);
+        blobHeader[0] = 2;
+        blobHeader[1] = newID;
+        blobHeader[2] = fileSize;
+        blobHeader[3] = start;
+        blobHeader[4] = end;
         var fBlob = new Blob([blobHeader, chunk]);
 
         start = end;
@@ -92,11 +105,14 @@ function uploadVideo(e)
         $("#uploadprogress").progress("set percent", Math.floor((start / fileSize) * 100));
     }
     $("#uploadprogress").progress("complete");
-    //genjioSocket.send(e.target.files[0]);
 }
 
 genjioSocket.onmessage = function(event) {
     var msg = JSON.parse(event.data);
+    if (msg.hasOwnProperty("newid")) {
+        doVideoUpload(msg.newid);
+        return;
+    }
     if (msg.hasOwnProperty("success")) {
         $("#analyseprogress").progress("complete");
         if (msg.success) {
