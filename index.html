@@ -103,7 +103,6 @@ function doVideoUpload(newID)
         start = end;
         end = start + chunkSize;
         genjioSocket.send(fBlob);
-        
     }
 }
 
@@ -125,7 +124,7 @@ genjioSocket.onmessage = function(event) {
         if (msg.success) {
             $("#uploadsuccess").transition("slide down");
             $("#templatename").html(templateNames[msg.template]);
-			$("#downloadlink").attr("href", msg.filename.replace("tmp", "videos");
+			$("#downloadlink").attr("href", msg.filename.replace("tmp", "videos"));
         } else {
             $("#uploadfailure").transition("slide down");
         }
