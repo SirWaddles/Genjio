@@ -2,7 +2,6 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include "videocheck.h"
-#include <Windows.h>
 
 #define FRAME_MULTIPLIER 10.0
 
