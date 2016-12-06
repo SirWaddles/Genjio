@@ -41,6 +41,7 @@
                 </div>
                 <div class="field" style="display: none;" id="uploadsuccess">
                     <h3 class="ui header">Your video is uploaded. You look like <span id="templatename"></span>! Awesome!</h3>
+					<h4 class="ui header"><a id="downloadlink">Check it out here!</a></h4>
                 </div>
                 <div class="field" style="display: none;" id="uploadfailure">
                     <h3 class="ui header">Your video didn't upload. Are you sure it was Genji?</h3>
@@ -102,9 +103,8 @@ function doVideoUpload(newID)
         start = end;
         end = start + chunkSize;
         genjioSocket.send(fBlob);
-        $("#uploadprogress").progress("set percent", Math.floor((start / fileSize) * 100));
+        
     }
-    $("#uploadprogress").progress("complete");
 }
 
 genjioSocket.onmessage = function(event) {
@@ -113,21 +113,32 @@ genjioSocket.onmessage = function(event) {
         doVideoUpload(msg.newid);
         return;
     }
+	if (msg.hasOwnProperty("start")) {
+		$("#uploadprogress").progress("set percent", msg.progress * 100);
+		if (msg.progress >= 0.99) {
+		    $("#uploadprogress").progress("complete");
+		}
+		return;
+	}
     if (msg.hasOwnProperty("success")) {
         $("#analyseprogress").progress("complete");
         if (msg.success) {
             $("#uploadsuccess").transition("slide down");
             $("#templatename").html(templateNames[msg.template]);
+			$("#downloadlink").attr("href", msg.filename.replace("tmp", "videos");
         } else {
             $("#uploadfailure").transition("slide down");
         }
         return;
     }
-    if (!$("#analyseprogress").data("started")) {
-        $("#analyseprogress").data("started", true);
-        $("#analyseprogress").transition("slide down");
-    }
-    $("#analyseprogress").progress("set percent", Math.floor(msg.progress * 100));
+	if (msg.hasOwnProperty("progress")) {
+		if (!$("#analyseprogress").data("started")) {
+			$("#analyseprogress").data("started", true);
+			$("#analyseprogress").transition("slide down");
+		}
+		$("#analyseprogress").progress("set percent", Math.floor(msg.progress * 100));
+		return;
+	}
 }
 
 </script>

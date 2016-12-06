@@ -8,3 +8,7 @@ genjio.vcxproj.filters
 node_modules/
 semantic/
 genjio.opensdf
+main
+genjio.db
+sqlite3.c
+sqlite3.o

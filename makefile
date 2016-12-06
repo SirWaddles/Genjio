@@ -1,7 +1,12 @@
-CC = g++
+CPP = g++
+CC = gcc
 CFLAGS = -Wall -I. -std=c++11 -I../include -I/usr/local/include
 MACROS = -DASIO_STANDALONE
-LIBS = -lpthread -lopencv_core -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
+LIBS = -ldl -lpthread -lopencv_core -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
 TARGET = genjio
-all: 
-	$(CC) $(CFLAGS) $(MACROS) files.cpp main.cpp task.cpp videocheck.cpp -o main $(LIBS)
+
+sqlite:
+        $(CC) -c sqlite3.c -o sqlite3.o
+
+all: sqlite
+        $(CPP) $(CFLAGS) $(MACROS) sqlite3.o files.cpp main.cpp task.cpp videocheck.cpp db.cpp -o main $(LIBS)

@@ -16,10 +16,15 @@ void receiveWSMessage(WSserver* server, websocketpp::connection_hdl hdl, WSserve
 	RunTask(server, hdl, msg);
 }
 
+void disconnectWS(WSserver* server, websocketpp::connection_hdl hdl) {
+	server->get_io_service().post(std::bind(&Task::RunTask<FileUploadDisconnectTask>, server, hdl, ""));
+}
+
 void startAsioServer() {
 	WSserver server;
 	server.init_asio();
 	server.set_message_handler(websocketpp::lib::bind(&receiveWSMessage, &server, websocketpp::lib::placeholders::_1, websocketpp::lib::placeholders::_2));
+	server.set_close_handler(websocketpp::lib::bind(&disconnectWS, &server, websocketpp::lib::placeholders::_1));
 	server.listen(9002);
 	server.start_accept();
 
